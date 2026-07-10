@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
 	getLocalPatients,
@@ -62,45 +62,39 @@ export default function LoginPage() {
 		// 🌟 HARDCODE บัญชีจำลองสำหรับเดโม (pt-123)
 		// ==========================================
 		if (sanitizedInputUser === "pt-123" || sanitizedInputUser === "pt_123") {
-			// 1. สร้าง Object ข้อมูลของ นายสมชัย ใจดี แบบครบถ้วนสำหรับใช้ในหน้า Main และหน้า Graph
 			const mockSomchaiPatient: PatientRecord = {
 				id: "PT-123",
 				name: "นายสมชัย ใจดี",
 				age: 70,
-				// คะแนนเต็มรววม 18/30 (จุดที่ต้องพัฒนาที่สุดคือ Recall และ Registration ที่เป็น Memory โดเมน)
 				scores: {
-					orientation: 5, // เต็ม 6
-					registration: 1, // เต็ม 3 (ต่ำ)
-					attention: 4, // เต็ม 5
-					calculation: 2, // เต็ม 3
-					language: 5, // เต็ม 10 (ต่ำ)
-					recall: 1, // เต็ม 3 (ต่ำที่สุดในสัดส่วนเปอร์เซ็นต์)
+					orientation: 5, 
+					registration: 1, 
+					attention: 4, 
+					calculation: 2, 
+					language: 5, 
+					recall: 1, 
 				},
 				totalScore: 18,
 				tempUser: "pt-123",
-				tempPass: "anypassword", // สามารถพิมพ์รหัสผ่านอะไรก็ได้ในหน้าจอเดโม
+				tempPass: "anypassword", 
 				status: "Active",
-				completedMissions: [], // วันแรกยังไม่ได้เริ่มทำภารกิจ
+				completedMissions: [], 
 			};
 
-			// 2. ดึงข้อมูลในฐานข้อมูลจำลองปัจจุบันขึ้นมา
 			const currentPatients = getLocalPatients();
-
-			// 3. ตรวจสอบว่ามีข้อมูลนายสมชัยอยู่ใน localStorage หรือยัง ถ้ายังไม่มีให้ Push บันทึกเข้าไป
 			const hasSomchai = currentPatients.some((p) => p.id === "PT-123");
 			if (!hasSomchai) {
 				currentPatients.push(mockSomchaiPatient);
 				saveLocalPatients(currentPatients);
 			}
 
-			// 4. บันทึกเซสชัน และพาข้ามหน้าไปหน้า Main ทันที
 			setCurrentSession("pt-123");
 			router.push("/");
 			return;
 		}
 
 		// ==========================================
-		// โฟลว์ตรวจสอบจาก localStorage ปกติ (ถ้าไม่ใช่รหัส pt-123)
+		// โฟลว์ตรวจสอบจาก localStorage ปกติ
 		// ==========================================
 		const patients = getLocalPatients();
 		const sanitizedUsername = username.trim().toLowerCase().replace("-", "_");
@@ -114,7 +108,7 @@ export default function LoginPage() {
 
 		if (validPatient.status === "Pending Activation") {
 			return alert(
-				"บัญชีนี้จำเป็นต้องสมัครและตั้งรหัสผ่านใหม่ก่อนใช้งานครั้งแรก",
+				"บัญชีนี้จำเป็นต้องลงทะเบียนและตั้งรหัสผ่านใหม่ก่อนใช้งานครั้งแรก",
 			);
 		}
 
@@ -123,77 +117,77 @@ export default function LoginPage() {
 	};
 
 	return (
-		<div className="w-full max-w-none bg-slate-100 min-h-screen flex items-center justify-center p-4 text-slate-800 antialiased">
-			<div className="w-full max-w-md bg-white rounded-3xl p-6 md:p-8 shadow-md border border-slate-200 space-y-6">
+		<div className="w-full max-w-none bg-slate-100 min-h-screen flex items-center justify-center p-4 md:p-8 text-slate-800 antialiased">
+			{/* ขยายกล่องให้ใหญ่ขึ้นสำหรับ iPad */}
+			<div className="w-full max-w-2xl bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl border-4 border-slate-200 space-y-8 md:space-y-10">
+				
 				{/* ส่วนหัวหน้าจอ */}
-				<div className="text-center space-y-2">
-					<div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-2xs">
+				<div className="text-center space-y-4">
+					<div className="w-20 h-20 md:w-28 md:h-28 bg-indigo-50 rounded-[2rem] flex items-center justify-center text-5xl md:text-6xl mx-auto shadow-sm border-4 border-indigo-100">
 						{isRegisterMode ? "🔑" : "🔐"}
 					</div>
-					<h1 className="text-xl font-black text-slate-900">
-						{isRegisterMode
-							? "ลงทะเบียน"
-							: "เข้าสู่ระบบ"}
+					<h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-wide">
+						{isRegisterMode ? "ลงทะเบียน" : "เข้าสู่ระบบ"}
 					</h1>
 				</div>
 
 				{/* ฟอร์มการทำงานสลับโหมด */}
 				{isRegisterMode ? (
 					// --- FORM REGISTRATION / ACTIVATE ---
-					<form onSubmit={handleActivateAccount} className="space-y-4">
+					<form onSubmit={handleActivateAccount} className="space-y-6 md:space-y-8">
 						<div>
-							<label className="text-[11px] font-bold text-slate-500 block mb-1">
-								Username ชั่วคราว (จาก OT)
+							<label className="text-xl md:text-2xl font-black text-slate-600 block mb-3">
+								ชื่อบัญชี (Username) จากผู้ดูแล
 							</label>
 							<input
 								type="text"
 								value={username}
 								onChange={(e) => setUsername(e.target.value)}
 								placeholder="เช่น pt_942"
-								className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold focus:outline-indigo-500"
+								className="w-full bg-slate-50 border-4 border-slate-200 rounded-2xl p-5 md:p-6 text-2xl md:text-3xl font-bold focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all"
 								required
 							/>
 						</div>
 						<div>
-							<label className="text-[11px] font-bold text-slate-500 block mb-1">
-								กำหนดรหัสผ่านใหม่ (สร้างเอง)
+							<label className="text-xl md:text-2xl font-black text-slate-600 block mb-3">
+								ตั้งรหัสผ่านใหม่ (สร้างเอง)
 							</label>
 							<input
 								type="password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
-								placeholder="ตั้งรหัสผ่านผู้ป่วย/ญาติ"
-								className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold focus:outline-indigo-500"
+								placeholder="รหัสผ่านอย่างน้อย 4 ตัว"
+								className="w-full bg-slate-50 border-4 border-slate-200 rounded-2xl p-5 md:p-6 text-2xl md:text-3xl font-bold focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all"
 								required
 							/>
 						</div>
 						<div>
-							<label className="text-[11px] font-bold text-slate-500 block mb-1">
+							<label className="text-xl md:text-2xl font-black text-slate-600 block mb-3">
 								ยืนยันรหัสผ่านอีกครั้ง
 							</label>
 							<input
 								type="password"
 								value={confirmPassword}
 								onChange={(e) => setConfirmPassword(e.target.value)}
-								placeholder="กรอกรหัสผ่านซ้ำอีกครั้ง"
-								className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold focus:outline-indigo-500"
+								placeholder="พิมพ์รหัสผ่านซ้ำอีกครั้ง"
+								className="w-full bg-slate-50 border-4 border-slate-200 rounded-2xl p-5 md:p-6 text-2xl md:text-3xl font-bold focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all"
 								required
 							/>
 						</div>
 						<button
 							type="submit"
-							className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs py-3 rounded-xl transition cursor-pointer shadow-xs"
+							className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-2xl md:text-3xl py-6 md:py-8 rounded-[2rem] transition-all cursor-pointer shadow-lg active:scale-95"
 						>
-							💾 บันทึกรหัสผ่านและเปิดใช้งานบัญชี
+							บันทึกและเปิดใช้งานบัญชี
 						</button>
-						<div className="text-center pt-2">
+						<div className="text-center pt-4">
 							<button
 								type="button"
 								onClick={() => {
 									setIsRegisterMode(false);
 									setPassword("");
 								}}
-								className="text-xs text-indigo-600 hover:underline font-semibold cursor-pointer"
+								className="text-xl md:text-2xl text-indigo-600 hover:text-indigo-800 underline font-black cursor-pointer p-4"
 							>
 								กลับไปหน้าเข้าสู่ระบบปกติ
 							</button>
@@ -201,42 +195,44 @@ export default function LoginPage() {
 					</form>
 				) : (
 					// --- FORM NORMAL LOGIN ---
-					<form onSubmit={handleLogin} className="space-y-4">
+					<form onSubmit={handleLogin} className="space-y-6 md:space-y-8">
 						<div>
-							<label className="text-[11px] font-bold text-slate-500 block mb-1">
-								ชื่อผู้ใช้งาน (Username)
+							<label className="text-xl md:text-2xl font-black text-slate-600 block mb-3">
+								ชื่อบัญชี (Username)
 							</label>
 							<input
 								type="text"
 								value={username}
 								onChange={(e) => setUsername(e.target.value)}
-								placeholder="ระบุบัญชีผู้ใช้ของคุณ"
-								className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold focus:outline-indigo-500"
+								placeholder="แตะเพื่อพิมพ์ชื่อบัญชี..."
+								className="w-full bg-slate-50 border-4 border-slate-200 rounded-2xl p-5 md:p-6 text-2xl md:text-3xl font-bold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all"
 								required
 							/>
 						</div>
 						<div>
-							<label className="text-[11px] font-bold text-slate-500 block mb-1">
+							<label className="text-xl md:text-2xl font-black text-slate-600 block mb-3">
 								รหัสผ่าน (Password)
 							</label>
 							<input
 								type="password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
-								placeholder="ระบุรหัสผ่านเข้าใช้งาน"
-								className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold focus:outline-indigo-500"
+								placeholder="แตะเพื่อพิมพ์รหัสผ่าน..."
+								className="w-full bg-slate-50 border-4 border-slate-200 rounded-2xl p-5 md:p-6 text-2xl md:text-3xl font-bold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all"
 								required
 							/>
 						</div>
+						
 						<button
 							type="submit"
-							className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs py-3 rounded-xl transition cursor-pointer shadow-xs"
+							className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-3xl md:text-4xl py-6 md:py-8 rounded-[2rem] transition-all cursor-pointer shadow-xl active:scale-95 mt-4"
 						>
 							เข้าสู่ระบบ
 						</button>
-						<div className="text-center pt-2 border-t border-slate-100 mt-2">
-							<p className="text-[11px] text-slate-400 mb-1">
-								ไม่เคยมีบัญชีมาก่อน?
+
+						<div className="text-center pt-6 border-t-4 border-slate-100 mt-6">
+							<p className="text-xl md:text-2xl text-slate-500 mb-4 font-bold">
+								ยังไม่เคยเปิดใช้งานบัญชี?
 							</p>
 							<button
 								type="button"
@@ -244,22 +240,21 @@ export default function LoginPage() {
 									setIsRegisterMode(true);
 									setPassword("");
 								}}
-								className="text-xs text-indigo-600 hover:underline font-extrabold cursor-pointer"
+								className="text-2xl md:text-3xl text-indigo-600 hover:text-indigo-800 underline font-black cursor-pointer p-4 bg-indigo-50 rounded-2xl w-full"
 							>
-								ลงทะเบียน
+								ลงทะเบียนผู้ใช้ใหม่
 							</button>
 						</div>
 					</form>
 				)}
 
-				{/* ปุ่มอำนวยความสะดวกสำหรับ Dev/Prototype สลับไปหน้าควบคุม OT */}
-				<div className="pt-2 text-center">
+				{/* ปุ่มอำนวยความสะดวกสำหรับ Dev/Prototype */}
+				<div className="pt-8 text-center">
 					<button
 						onClick={() => router.push("/ot-admin")}
-						className="text-[10px] text-slate-400 hover:text-slate-600 underline font-medium"
+						className="text-lg md:text-xl text-slate-400 hover:text-slate-600 underline font-bold bg-slate-50 px-6 py-4 rounded-xl w-full"
 					>
-						⚙️ สลับไปยังแผงควบคุมหลักฝั่ง OT Admin
-						เพื่อดูรายชื่อสิทธิ์บัญชีผู้ใช้
+						สลับไปยังหน้าผู้ดูแลระบบ (OT Admin)
 					</button>
 				</div>
 			</div>
