@@ -9,47 +9,41 @@ import {
 	PatientRecord,
 } from "@/utils/storage";
 
-// 🧠 อัปเดตเพิ่มหมวดย่อยของ Memory เข้าไปในระบบคลังข้อสอบหลัก
+// 🧠 ปรับคำอธิบายให้สั้น กระชับ อ่านง่าย และใหญ่ขึ้น
 const EXERCISE_POOL = {
 	memory_digit: {
-		title: "🧠 จำตัวเลข (Digit Recall)",
-		description:
-			"ฝึกฝนความจำระยะสั้นขั้นสูงและการจัดลำดับข้อมูล โดยระบบจะแสดงชุดตัวเลขให้คุณจดจำและตอบให้ถูกต้อง",
+		title: "จำตัวเลข",
+		description: "จดจำและจัดลำดับชุดตัวเลขให้ถูกต้อง",
 		estimatedTime: "3 นาที",
 		icon: "🔢",
 	},
 	memory_words: {
-		title: "🧠 จำคำศัพท์ (Word Association)",
-		description:
-			"เพิ่มความสามารถในการเก็บบันทึกข้อมูลคำในสมอง จดจำกลุ่มคำศัพท์จำลองแล้วเลือกคำที่ปรากฏให้ถูกต้อง",
+		title: "จำคำศัพท์",
+		description: "จดจำกลุ่มคำศัพท์และเลือกคำที่ถูกต้อง",
 		estimatedTime: "3 นาที",
 		icon: "📝",
 	},
 	memory_story: {
-		title: "🧠 จำเรื่องราว (Story Retention)",
-		description:
-			"ฝึกสมาธิและการจับใจความสําคัญ อ่านเนื้อเรื่องหรือเหตุการณ์สั้นๆ แล้วตอบคำถามเกี่ยวกับเรื่องราวนั้น",
+		title: "จำเรื่องราว",
+		description: "อ่านเรื่องราวสั้นๆ และตอบคำถาม",
 		estimatedTime: "4 นาที",
 		icon: "📖",
 	},
 	attention: {
-		title: "⚡ จับผิดภาพกลุ่มตัวเลข (Selective Attention)",
-		description:
-			"ฝึกการโฟกัสและสมาธิ ค้นหาตัวเลขโดดที่แปลกแยกออกจากกลุ่มตัวเลขที่กำหนดภายใน 60 วินาที",
+		title: "จับผิดภาพ",
+		description: "หาตัวเลขหรือภาพที่ต่างจากพวก",
 		estimatedTime: "4 นาที",
 		icon: "🔍",
 	},
 	calculation: {
-		title: "🔢 ตลาดนัดนักคิด (Daily Mart Math)",
-		description:
-			"ฝึกการทำงานของสมองส่วนหน้าผ่านการจำลองคำนวณเงินทอนและราคาสินค้าในชีวิตประจำวัน",
+		title: "คิดเลข ซื้อของ",
+		description: "ฝึกสมองด้วยการจำลองการคิดเงิน",
 		estimatedTime: "5 นาที",
 		icon: "🛒",
 	},
 	language: {
-		title: "✏️ ต่อคำเติมสำนวน (Word Completion)",
-		description:
-			"ฟื้นฟูทักษะด้านภาษาและการนึกคิดคำศัพท์ โดยเลือกตัวอักษรที่หายไปเพื่อประกอบเป็นคำที่มีความหมาย",
+		title: "เติมคำสำนวน",
+		description: "เลือกตัวอักษรมาเติมเป็นคำที่มีความหมาย",
 		estimatedTime: "3 นาที",
 		icon: "🗣️",
 	},
@@ -67,14 +61,12 @@ export default function PatientMainPage() {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
 	useEffect(() => {
-		// 1. ดึงข้อมูลเซสชันคนไข้ปัจจุบัน
 		const userSession = getCurrentSession();
 		if (!userSession) {
 			router.push("/login");
 			return;
 		}
 
-		// 2. ดึงข้อมูลประวัติจากฐานข้อมูลจำลอง
 		const patients = getLocalPatients();
 		const patient = patients.find((p) => p.tempUser === userSession);
 
@@ -88,7 +80,6 @@ export default function PatientMainPage() {
 				(min, current) => (current.val < min.val ? current : min),
 				scoreEntries[0],
 			);
-			// หากเป้าหมายดั้งเดิมคือ memory ให้ default ไปที่ตัวย่อยอันแรก
 			const targetedDomain =
 				lowest.key === "memory" ? "memory_digit" : lowest.key;
 			const finalDomain = customDomain || targetedDomain;
@@ -122,7 +113,7 @@ export default function PatientMainPage() {
 				{ key: "calculation", score: (scores.calculation / 3) * 100 },
 				{ key: "language", score: (scores.language / 10) * 100 },
 				{
-					key: "memory_digit", // ปรับการแมพคะแนนให้เข้ากับหมวดย่อยตัวแทน
+					key: "memory_digit",
 					score: ((scores.registration + scores.recall) / 6) * 100,
 				},
 			];
@@ -156,119 +147,105 @@ export default function PatientMainPage() {
 
 	if (isLoading || !currentPatient || !recommendedExercise) {
 		return (
-			<div className="w-full min-h-screen flex items-center justify-center bg-slate-50 font-bold text-xs text-slate-400">
-				กำลังตรวจสอบความปลอดภัยและจัดเตรียมระบบภารกิจเฉพาะบุคคล...
+			<div className="w-full min-h-screen flex items-center justify-center bg-slate-100 font-black text-3xl text-slate-500 p-8 text-center leading-relaxed">
+				กำลังเตรียมบททดสอบ...
 			</div>
 		);
 	}
 
 	return (
-		<div className="w-full max-w-none bg-slate-50 min-h-screen p-4 md:p-8 text-slate-800 antialiased">
-			<div className="max-w-xl mx-auto space-y-6">
-				{/* หัวเว็บและการกดออกจากระบบ */}
-				<div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-2xs flex justify-between items-center">
-					<div className="space-y-1">
-						<h1 className="text-xl font-black text-slate-900">
-							สวัสดีครับ, {currentPatient.name}
+		<div className="w-full max-w-none bg-slate-100 min-h-screen p-4 md:p-8 text-slate-800 antialiased flex flex-col items-center">
+			<div className="w-full max-w-3xl space-y-8 md:space-y-10">
+				
+				{/* 1. หัวเว็บและการกดออกจากระบบ */}
+				<div className="bg-white rounded-[2rem] p-8 border-4 border-slate-200 shadow-sm flex justify-between items-center">
+					<div>
+						<h1 className="text-4xl md:text-5xl font-black text-slate-900">
+							สวัสดี, <span className="text-indigo-600">{currentPatient.name.split(' ')[0]}</span>
 						</h1>
 					</div>
 					<button
 						onClick={handleLogout}
-						className="bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 p-2.5 rounded-2xl text-xs font-bold transition shadow-3xs cursor-pointer"
+						className="bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-600 px-6 py-4 rounded-2xl text-xl md:text-2xl font-black transition cursor-pointer active:scale-95"
 					>
-						ออกจากระบบ
+						ออก
 					</button>
 				</div>
 
-				{/* บอร์ด Personalized แนะนำภารกิจจาก Cognitive Profile */}
-				<div className="bg-indigo-900 text-indigo-100 p-4.5 rounded-3xl border border-indigo-950 space-y-1 shadow-xs">
-					<p className="text-md leading-relaxed text-indigo-100/90 font-medium">
-						คุณมีทักษะด้าน{" "}
-						<span className="text-white font-black underline">{domainKey}</span>{" "}
-						ที่ควรเน้นย้ำ
+				{/* 2. บอร์ด Personalized แนะนำภารกิจ (ขยายใหญ่ขึ้น) */}
+				<div className="bg-indigo-900 text-indigo-100 p-8 rounded-[2rem] border-4 border-indigo-950 shadow-lg text-center md:text-left">
+					<p className="text-2xl md:text-4xl leading-snug font-bold">
+						ควรเน้นฝึกทักษะ: <br className="block md:hidden" />
+						<span className="text-white font-black bg-indigo-700 px-4 py-2 rounded-2xl md:ml-2 mt-4 md:mt-0 inline-block border-2 border-indigo-500 shadow-sm uppercase">
+							{domainKey}
+						</span>
 					</p>
 				</div>
 
-				{/* บัตร Task ประจำวัน */}
-				<div className="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-xs space-y-5 text-center relative overflow-hidden pt-12">
-					{/* ป้าย Focus อยู่ขวาบนเหมือนเดิม */}
-					<div className="absolute top-4 right-4 bg-amber-50 text-amber-700 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase border border-amber-200">
-						Focus: {domainKey}
-					</div>
-
-					{/* ย้ายป้าย Daily Task มาไว้ที่ซ้ายบน */}
-					<div className="absolute top-4 left-4">
-						<span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
-							ภารกิจฝึกสมองวันนี้ (Daily Task)
-						</span>
-					</div>
-
-					<div className="mx-auto w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl border border-slate-100">
+				{/* 3. บัตร Task ประจำวัน (จุดสนใจหลัก ขนาดยักษ์) */}
+				<div className="bg-white rounded-[2.5rem] p-8 md:p-12 border-4 border-slate-200 shadow-xl space-y-8 text-center relative overflow-hidden">
+					<div className="mx-auto w-32 h-32 md:w-40 md:h-40 bg-slate-50 rounded-full flex items-center justify-center text-7xl md:text-8xl border-8 border-slate-100 shadow-inner">
 						{recommendedExercise.icon}
 					</div>
 
-					<div className="space-y-2">
-						<h2 className="text-lg font-black text-slate-900 pt-1">
+					<div className="space-y-4 md:space-y-6">
+						<h2 className="text-5xl md:text-6xl font-black text-slate-900">
 							{recommendedExercise.title}
 						</h2>
-						<p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed font-medium">
-							{recommendedExercise.description}
-						</p>
 					</div>
 
-					<hr className="border-slate-100" />
+					<hr className="border-4 border-slate-50 rounded-full my-8" />
 
+					{/* ปุ่มเริ่มภารกิจขนาดยักษ์ แตะง่าย */}
 					<button
 						onClick={() => router.push(`/mission?domain=${domainKey}`)}
-						className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm py-4 rounded-2xl transition-all shadow-md shadow-emerald-100 cursor-pointer active:scale-98"
+						className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-4xl md:text-5xl py-8 md:py-10 rounded-[2.5rem] transition-all shadow-2xl shadow-emerald-200 cursor-pointer active:scale-95 flex items-center justify-center gap-4"
 					>
-						เริ่มทำแบบฝึกหัด ➔
+						เริ่มฝึก ➔
 					</button>
 				</div>
 
-				{/* ส่วนของ Timeline แยกออกมาต่างหาก */}
-				<div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
-					<div className="flex justify-between items-end">
-						<h3 className="text-sm font-black text-slate-900">
-							Progress Timeline
+				{/* 4. ส่วนของ Timeline ประวัติการฝึกฝน */}
+				<div className="bg-white rounded-[2rem] p-8 md:p-10 border-4 border-slate-200 shadow-sm space-y-8">
+					<div className="flex flex-col md:flex-row justify-between items-center gap-4">
+						<h3 className="text-3xl md:text-4xl font-black text-slate-900">
+							ประวัติการฝึก
 						</h3>
-						<span className="text-[10px] font-bold text-slate-400">
-							Streak: 3 วันต่อเนื่อง
+						<span className="text-xl md:text-2xl font-black text-emerald-700 bg-emerald-100 px-6 py-3 rounded-2xl border-2 border-emerald-200">
+							🔥 ติดต่อกัน: 3 วัน
 						</span>
 					</div>
 
-					<div className="flex items-center gap-3">
-						{/* แสดงสถานะย้อนหลัง 4 วัน */}
-						<div className="flex-1 flex flex-col items-center gap-2">
-							<div className="w-full h-2 bg-emerald-500 rounded-full"></div>
-							<span className="text-[9px] font-bold text-emerald-600">จ.</span>
+					<div className="flex items-center justify-between gap-4 pt-4">
+						{/* แสดงสถานะย้อนหลัง */}
+						<div className="flex-1 flex flex-col items-center gap-4">
+							<div className="w-full h-4 md:h-6 bg-emerald-500 rounded-full shadow-inner"></div>
+							<span className="text-2xl font-black text-emerald-700">จ.</span>
 						</div>
-						<div className="flex-1 flex flex-col items-center gap-2">
-							<div className="w-full h-2 bg-emerald-500 rounded-full"></div>
-							<span className="text-[9px] font-bold text-emerald-600">อ.</span>
+						<div className="flex-1 flex flex-col items-center gap-4">
+							<div className="w-full h-4 md:h-6 bg-emerald-500 rounded-full shadow-inner"></div>
+							<span className="text-2xl font-black text-emerald-700">อ.</span>
 						</div>
-						<div className="flex-1 flex flex-col items-center gap-2">
-							<div className="w-full h-2 bg-emerald-500 rounded-full"></div>
-							<span className="text-[9px] font-bold text-emerald-600">พ.</span>
+						<div className="flex-1 flex flex-col items-center gap-4">
+							<div className="w-full h-4 md:h-6 bg-emerald-500 rounded-full shadow-inner"></div>
+							<span className="text-2xl font-black text-emerald-700">พ.</span>
 						</div>
-						<div className="flex-1 flex flex-col items-center gap-2">
-							<div className="w-full h-2 bg-slate-200 rounded-full animate-pulse"></div>
-							<span className="text-[9px] font-bold text-slate-400">
-								วันนี้
-							</span>
+						<div className="flex-1 flex flex-col items-center gap-4">
+							<div className="w-full h-4 md:h-6 bg-slate-200 rounded-full animate-pulse border-2 border-slate-300"></div>
+							<span className="text-2xl font-black text-slate-500">วันนี้</span>
 						</div>
 					</div>
 				</div>
 
-				{/* แผงปุ่มจำลองการเลือกจุดอ่อน (เพิ่มปุ่มสลับหมวดย่อยของความจำครบทั้ง 3 แบบ) */}
-				<div className="bg-white rounded-3xl p-4 border border-slate-200 shadow-3xs space-y-3 text-left">
-					<div className="flex items-center gap-2">
-						<span className="flex h-2 w-2 rounded-full bg-indigo-600 animate-pulse"></span>
-						<h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
-							ตัวเลือกจำลอง Profile คนไข้แต่ละโรค (สลับหมวดแนะนำของ AI)
+				{/* 5. แผงปุ่มจำลองการเลือกโหมด (Therapist Mode) */}
+				<div className="bg-white rounded-[2rem] p-8 border-4 border-slate-200 shadow-sm space-y-6 text-left opacity-90 hover:opacity-100 transition-opacity">
+					<div className="flex items-center gap-4 border-b-4 border-slate-100 pb-4">
+						<span className="flex h-5 w-5 rounded-full bg-indigo-600 animate-pulse"></span>
+						<h3 className="text-2xl md:text-3xl font-black text-slate-800 tracking-wider">
+							โหมดนักบำบัด (เลือกหมวด)
 						</h3>
 					</div>
-					<div className="flex flex-wrap gap-1.5">
+					<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 						{[
 							"memory_digit",
 							"memory_words",
@@ -280,13 +257,13 @@ export default function PatientMainPage() {
 							<button
 								key={key}
 								onClick={() => setCustomDomain(key)}
-								className={`px-3 py-1.5 rounded-xl text-[11px] font-bold border transition cursor-pointer ${
+								className={`px-4 py-5 rounded-2xl text-xl md:text-2xl font-black border-4 transition cursor-pointer active:scale-95 ${
 									domainKey === key
-										? "bg-indigo-600 text-white border-indigo-700"
-										: "bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200"
+										? "bg-indigo-600 text-white border-indigo-700 shadow-md"
+										: "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-300"
 								}`}
 							>
-								🎯 จำลองจุดอ่อนด้าน: {key}
+								{key.split("_")[0]}
 							</button>
 						))}
 					</div>
@@ -294,4 +271,4 @@ export default function PatientMainPage() {
 			</div>
 		</div>
 	);
-}
+}	
