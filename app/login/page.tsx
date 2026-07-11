@@ -248,6 +248,12 @@ export default function LoginPage() {
 					</form>
 				)}
 
+				<div className="pt-8 text-center">
+					<p className="text-xl md:text-2xl text-slate-500 text-center font-bold leading-snug">
+						สำหรับ Prototype ให้ใช้บัญชีจำลอง <span className="text-indigo-600">pt-123</span> และรหัสผ่านใดก็ได้
+					</p>
+				</div>
+
 				{/* ปุ่มอำนวยความสะดวกสำหรับ Dev/Prototype */}
 				<div className="pt-8 text-center">
 					<button
